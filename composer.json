@@ -1,0 +1,21 @@
+{
+    "name": "clpublic/phpsdk",
+    "description": "clpublic php sdk",
+    "type": "library",
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "Clpublic\\Phpsdk\\": "src/"
+        },
+        "files": [
+            "src/helps.php"
+        ]
+    },
+    "authors": [
+        {
+            "name": "lei"
+        }
+    ],
+    "minimum-stability": "dev",
+    "require": {}
+}
