@@ -1,6 +1,6 @@
 <?php
 
-namespace Clpublic\PhpSdk;
+namespace Cl\OpenAPISDK;
 
 use \Exception;
 

@@ -1,16 +1,18 @@
 {
     "name": "clpublic/phpsdk",
+    "version": "1.0.0",
     "description": "clpublic php sdk",
     "type": "library",
     "license": "MIT",
     "autoload": {
         "psr-4": {
-            "Clpublic\\Phpsdk\\": "src/"
+            "Cl\\OpenAPISDK\\": "src/"
         },
         "files": [
             "src/helps.php"
         ]
     },
+
     "authors": [
         {
             "name": "lei"
@@ -19,6 +21,13 @@
     "minimum-stability": "dev",
     "require": {
         "php": "^7.4 || ^8.0",
-        "guzzlehttp/guzzle": "^7.0"
+        "guzzlehttp/guzzle": "^7.0",
+        "ext-json": "*",
+        "ext-openssl": "*",
+        "ext-mbstring": "*",
+        "ext-mcrypt": "*"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "9.6.x-dev"
     }
 }

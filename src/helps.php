@@ -1,5 +1,6 @@
 <?php
 
+
 function apiResponse($result){
     $data = [
         'reqId'=>$result['reqId'],
@@ -12,55 +13,74 @@ function apiResponse($result){
 
 //cbc加密
 function aesEncryptCBC($origData, $key) {
-    $blockSize = strlen($key); // AES的块大小
-    $origData = pkcs5Padding($origData, $blockSize); // 填充原始数据
-    $encrypted = '';
-    $iv = openssl_random_pseudo_bytes($blockSize); // 随机生成初始化向量IV
-    $encrypted = openssl_encrypt(
+    $blockSize = 16; // AES的块大小
+
+//    $origData = pkcs5Padding($origData, $blockSize);
+//
+//    for ($i=0;$i<strlen($origData);$i++) {
+//        echo ord($origData[$i])." ";
+//    }
+
+
+    $iv = substr($key,0,16); // 生成随机初始化向量
+
+    $encryptedData = openssl_encrypt(
         $origData,
-        'aes-128-cbc', // 加密算法和模式
+        'aes-256-cbc',
         $key,
         OPENSSL_RAW_DATA,
         $iv
     );
-    if ($encrypted === false) {
-        return ['', 'Encryption failed: ' . openssl_error_string()];
+
+    if ($encryptedData === false) {
+        return ['encrypted' => null, 'error' => 'Encryption failed'];
     }
-    return [$encrypted, $iv];
+
+//    echo 'bin2hex -$encryptedData :'.bin2hex($encryptedData).PHP_EOL;
+//
+//    for ($i=0;$i<strlen($encryptedData);$i++) {
+//        echo ord($encryptedData[$i])." ";
+//    }
+
+    return ['encrypted' => $encryptedData, 'iv' => $iv];
 }
 
 //cbc解密
-function aesDecryptCBC($encrypted, $key) {
-    $blockSize = strlen($key); // AES的块大小
-    $decrypted = '';
-    $ivSize = openssl_cipher_iv_length('aes-128-cbc'); // 获取初始化向量的大小
-    $iv = substr($encrypted, 0, $ivSize); // 提取初始化向量
-    $encryptedData = substr($encrypted, $ivSize); // 提取加密数据
+function aesDecryptCBC($encryptedData, $key) {
 
-    $decrypted = openssl_decrypt(
-        $encryptedData,
-        'aes-128-cbc',
-        $key,
-        OPENSSL_RAW_DATA,
-        $iv
-    );
+    $iv = substr($key,0,16);
 
-    if ($decrypted === false) {
-        return ['', 'Decryption failed: ' . openssl_error_string()];
+    $decryptedData = openssl_decrypt($encryptedData, 'aes-256-cbc', $key, OPENSSL_RAW_DATA, $iv);
+    if ($decryptedData === false) {
+        return ['decrypted' => null, 'error' => 'Decryption failed'];
     }
-
-    $decrypted = pkcs5UnPadding($decrypted); // 去除填充
-    return [$decrypted, ''];
+    return ['decrypted' => $decryptedData, 'iv' => $iv];
 }
 
-function pkcs5Padding($ciphertext, $blockSize) {
-    $padding = $blockSize - (strlen($ciphertext) % $blockSize);
-    $padText = str_repeat(chr($padding), $padding);
-    return $ciphertext . $padText;
+function pkcs5Padding($text, $blockSize) {
+
+    $padding = $blockSize - (strlen($text) % $blockSize);
+
+    var_dump('$padding ==== '.$padding);
+
+    $text .= str_repeat(chr($padding), $padding);
+    return $text;
 }
 
 function pkcs5UnPadding($origData) {
-    $length = strlen($origData);
-    $unPadding = ord($origData[$length - 1]);
-    return substr($origData, 0, $length - $unPadding);
+    $unPadding = ord($origData[strlen($origData) - 1]);
+    return substr($origData, 0, -$unPadding);
+}
+
+function dd(...$vars)
+{
+    echo '<pre>';
+
+    foreach ($vars as $v) {
+        var_dump($v);
+    }
+
+    echo '</pre>';
+
+    exit(1);
 }
